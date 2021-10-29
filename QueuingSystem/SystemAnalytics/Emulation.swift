@@ -16,12 +16,8 @@ class Emulation {
         self.nodes = nodes
     }
     
-    func emulate(ticks: Int) -> [[Int]: Int] {
-        var totalRequestDone: Int = 0
-        var totalRequestInSystemTime: Int = 0
-        var totalReject: Int = 0
-        var totalBlocked: Int = 0
-        var totalRequestInQueueTime: Int = 0
+    func emulate(ticks: Int) {
+        var shoulRequestCome: Bool = true
         
         var state: [Int] = [0,0,0,0]
         var states: [[Int]: Int] = [[0,0,0,0]:0,
@@ -34,33 +30,52 @@ class Emulation {
                                     [1,1,1,1]:0]
         
         for tick in 0..<ticks {
+            shoulRequestCome = nodes[0].isFull() ? false : true
             for indexNode in stride(from: 3, through: 0, by: -1) {
                 let node = nodes[indexNode]
                 switch indexNode {
                 case 3:
                     if node.isFull() && node.isWorked(workedProbability: lemerSequence[tick]) {
-                        totalRequestDone += 1
+                        //print("\(tick): пи 2 отработал")
+                        Statistics.totalRequestDone += 1
                         if let request = node.request {
-                            totalRequestInSystemTime += request.endLifeTime(removeTime: tick)
+                            Statistics.totalRequestInSystemTime += request.endLifeTime(removeTime: tick)
                         }
                         node.request = nil
                     }
                 case 2:
                     if node.isFull() && node.isWorked(workedProbability: lemerSequence[tick]) {
+                        //print("\(tick): пи 1 отработал")
                         if !nodes[3].isFull() {
                             nodes[3].request = node.request
                         } else {
-                            totalReject += 1
+                            Statistics.totalReject += 1
                         }
                         node.request = nil
+                        if nodes[1].isFull() {
+                            node.request = nodes[1].request
+                            nodes[1].request = nil
+                            Statistics.totalRequestInQueueTime += node.request!.endQueueTime(exitTime: tick)
+                            Statistics.totalRequestQueueDone += 1
+                            if nodes[0].isFull() {
+                                nodes[1].request = nodes[0].request
+                                nodes[1].request!.setupQueueEnterTime(queueEnter: tick)
+                                nodes[0].request = nil
+                            }
+                        }
                     }
                 case 1:
                     if node.isFull() && !nodes[2].isFull() {
+                        //print("\(tick): очередь сдвинулась")
                         nodes[2].request = node.request
+                        Statistics.totalRequestQueueDone += 1
                         if let request = node.request {
-                            totalRequestInQueueTime += request.endQueueTime(exitTime: tick)
+                            Statistics.totalRequestInQueueTime += request.endQueueTime(exitTime: tick)
                         }
                         if nodes[0].isFull() {
+                            if let request = node.request {
+                                request.setupQueueEnterTime(queueEnter: tick)
+                            }
                             node.request = nodes[0].request
                             nodes[0].request = nil
                         } else {
@@ -68,20 +83,21 @@ class Emulation {
                         }
                     }
                 case 0:
-                    //if full -> nothing
-                    if !node.isFull() {
+                    if shoulRequestCome {
                         if node.isWorked(workedProbability: lemerSequence[tick]) {
+                            //print("\(tick): заявка пришла")
+                            Statistics.totalRequestGenerated += 1
                             node.request = Request(creationTime: tick)
                             if nodes[1].isFull() {
-                                totalBlocked += 1
+                                Statistics.totalBlocked += 1
                             } else {
                                 if nodes[2].isFull() {
-                                    if let request = node.request {
-                                        request.setupQueueEnterTime(queueEnter: tick)
-                                        nodes[1].request = node.request
-                                    }
+                                    node.request!.setupQueueEnterTime(queueEnter: tick)
+                                    nodes[1].request = node.request
+                                    
                                 } else {
                                     nodes[2].request = node.request
+                                    Statistics.totalRequestQueueDone += 1
                                 }
                                 node.request = nil
                             }
@@ -94,6 +110,19 @@ class Emulation {
             
             for (index, node) in nodes.enumerated() {
                 state[index] = node.request != nil ? 1 : 0
+                if node.request != nil {
+                    Statistics.totalRequestSystem += 1
+                    if index == 1 {
+                        Statistics.totalRequestQueue += 1
+                    }
+                    if index == 2 {
+                        Statistics.totalRequestFirstChannel += 1
+                    }
+                    if index == 3 {
+                        Statistics.totalRequestSecondChannel += 1
+                    }
+                }
+                
             }
             
             for (key, value) in states {
@@ -102,6 +131,6 @@ class Emulation {
                 }
             }
         }
-        return states
+        Statistics.states = states
     }
 }

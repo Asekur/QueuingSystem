@@ -28,7 +28,18 @@ class ViewController: NSViewController {
             Node(rejectProbability: 0.8)
         ]
         let emulation = Emulation(lemerSequence: lemerNumbers.getXValues(), nodes: nodes)
-        print(emulation.emulate(ticks: Constants.n))
+        emulation.emulate(ticks: Constants.n)
+        //print(Statistics.getProbabilities())
+        //print(Statistics.getRejectionProbability())
+        //print(Statistics.getLockProbability()) //?
+        //print(Statistics.getRelativeBandwidth())
+        //print(Statistics.getAbsoluteBandwidth())
+        //print(Statistics.getAverageRequestInQueueTime())
+        //print(Statistics.getAverageRequestInSystemTime()) //?
+        //print(Statistics.getAverageSystemLength())
+        //print(Statistics.getAverageQueueLength())
+        //print(Statistics.getChannelFirsh())
+        //print(Statistics.getChannelSecond())
     }
     
     override var representedObject: Any? {
