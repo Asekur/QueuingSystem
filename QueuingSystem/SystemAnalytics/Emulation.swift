@@ -38,14 +38,11 @@ class Emulation {
                     if node.isFull() && node.isWorked(workedProbability: lemerSequence[tick]) {
                         //print("\(tick): пи 2 отработал")
                         Statistics.totalRequestDone += 1
-                        if let request = node.request {
-                            Statistics.totalRequestInSystemTime += request.endLifeTime(removeTime: tick)
-                        }
+                        Statistics.totalRequestInSystemTime += node.request!.endLifeTime(removeTime: tick)
                         node.request = nil
                     }
                 case 2:
                     if node.isFull() && node.isWorked(workedProbability: lemerSequence[tick]) {
-                        //print("\(tick): пи 1 отработал")
                         if !nodes[3].isFull() {
                             nodes[3].request = node.request
                         } else {
@@ -66,16 +63,11 @@ class Emulation {
                     }
                 case 1:
                     if node.isFull() && !nodes[2].isFull() {
-                        //print("\(tick): очередь сдвинулась")
                         nodes[2].request = node.request
                         Statistics.totalRequestQueueDone += 1
-                        if let request = node.request {
-                            Statistics.totalRequestInQueueTime += request.endQueueTime(exitTime: tick)
-                        }
+                        Statistics.totalRequestInQueueTime += node.request!.endQueueTime(exitTime: tick)
                         if nodes[0].isFull() {
-                            if let request = node.request {
-                                request.setupQueueEnterTime(queueEnter: tick)
-                            }
+                            nodes[0].request!.setupQueueEnterTime(queueEnter: tick)
                             node.request = nodes[0].request
                             nodes[0].request = nil
                         } else {
@@ -83,9 +75,11 @@ class Emulation {
                         }
                     }
                 case 0:
+                    if (node.isFull()) {
+                        Statistics.totalBlocked += 1
+                    }
                     if shoulRequestCome {
                         if node.isWorked(workedProbability: lemerSequence[tick]) {
-                            //print("\(tick): заявка пришла")
                             Statistics.totalRequestGenerated += 1
                             node.request = Request(creationTime: tick)
                             if nodes[1].isFull() {

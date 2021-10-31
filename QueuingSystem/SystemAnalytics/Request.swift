@@ -11,9 +11,9 @@ class Request {
     let creationTime: Int
     var queueEnterTime: Int
     
-    init(creationTime: Int) {
+    init(creationTime: Int, queueEnterTime: Int = 0) {
         self.creationTime = creationTime
-        self.queueEnterTime = 0
+        self.queueEnterTime = queueEnterTime
     }
     
     func endLifeTime(removeTime: Int) -> Int {

@@ -37,7 +37,7 @@ class Statistics {//: IStatistics {
 
     //P_блок
     static func getLockProbability() -> Double {
-        return Double(Statistics.totalBlocked) / Double(Statistics.totalRequestGenerated)
+        return Double(Statistics.totalBlocked) / Double(Constants.n)
     }
     
     //L_оч
