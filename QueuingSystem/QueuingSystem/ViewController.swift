@@ -12,6 +12,7 @@ class ViewController: NSViewController {
     @IBOutlet weak var pTextField: NSTextField!
     @IBOutlet weak var pi1TextField: NSTextField!
     @IBOutlet weak var pi2TextField: NSTextField!
+    @IBOutlet var resultTextView: NSTextView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,18 +30,28 @@ class ViewController: NSViewController {
         ]
         let emulation = Emulation(lemerSequence: lemerNumbers.getXValues(), nodes: nodes)
         emulation.emulate(ticks: Constants.n)
-        print("Вероятности состояний \(Statistics.getProbabilities())")
-        print("Вероятность отказа \(Statistics.getRejectionProbability())")
-        print("Вероятность блокировки \(Statistics.getLockProbability())")
-        print("Относительная пропускная способность \(Statistics.getRelativeBandwidth())")
-        print("Абсолютная пропускная способность \(Statistics.getAbsoluteBandwidth())")
-        print("Среднее время заявки в очереди \(Statistics.getAverageRequestInQueueTime())")
-        print("Среднее время заявки в системе \(Statistics.getAverageRequestInSystemTime())") //?
-        print("Средняя длина системы \(Statistics.getAverageSystemLength())")
-        print("Средняя длина очереди \(Statistics.getAverageQueueLength())")
-        print("Нагрузка первого канала \(Statistics.getChannelFirsh())")
-        print("Нагрузка второго канала \(Statistics.getChannelSecond())")
+        
+        resultTextView.string =
+        "Вероятности состояний\n\(Statistics.getProbabilities())\n" +
+        "Вероятность отказа \(Statistics.getRejectionProbability().roundToPlaces(places: 4))\n" +
+        "Вероятность блокировки \(Statistics.getLockProbability().roundToPlaces(places: 4))\n" +
+        "Относительная пропускная способность \(Statistics.getRelativeBandwidth().roundToPlaces(places: 4))\n" +
+        "Абсолютная пропускная способность \(Statistics.getAbsoluteBandwidth().roundToPlaces(places: 4))\n" +
+        "Среднее время заявки в очереди \(Statistics.getAverageRequestInQueueTime().roundToPlaces(places: 4))\n" +
+        "Среднее время заявки в системе \(Statistics.getAverageRequestInSystemTime().roundToPlaces(places: 4))\n" +
+        "Средняя длина системы \(Statistics.getAverageSystemLength().roundToPlaces(places: 4))\n" +
+        "Средняя длина очереди \(Statistics.getAverageQueueLength().roundToPlaces(places: 4))\n" +
+        "Нагрузка первого канала \(Statistics.getChannelFirsh().roundToPlaces(places: 4))\n" +
+        "Нагрузка второго канала \(Statistics.getChannelSecond().roundToPlaces(places: 4))"
+        
+        Statistics.clearValues()
     }
 
 }
 
+extension Double {
+    func roundToPlaces(places: Int) -> Double {
+        let divisor = pow(10.0, Double(places))
+        return (self * divisor).rounded() / divisor
+    }
+}

@@ -24,7 +24,6 @@ class Node {
     }
     
     func isWorked(workedProbability: Double) -> Bool {
-        //return workedProbability < processingProbability!
-        return Double.random(in: 0...1) < processingProbability!
+        return workedProbability < processingProbability!
     }
 }

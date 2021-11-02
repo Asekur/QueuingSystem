@@ -35,14 +35,14 @@ class Emulation {
                 let node = nodes[indexNode]
                 switch indexNode {
                 case 3:
-                    if node.isFull() && node.isWorked(workedProbability: lemerSequence[tick]) {
+                    if node.isFull() && node.isWorked(workedProbability: lemerSequence[Int.random(in: 0..<Constants.n)]) {
                         //print("\(tick): пи 2 отработал")
                         Statistics.totalRequestDone += 1
                         Statistics.totalRequestInSystemTime += node.request!.endLifeTime(removeTime: tick)
                         node.request = nil
                     }
                 case 2:
-                    if node.isFull() && node.isWorked(workedProbability: lemerSequence[tick]) {
+                    if node.isFull() && node.isWorked(workedProbability: lemerSequence[Int.random(in: 0..<Constants.n)]) {
                         if !nodes[3].isFull() {
                             nodes[3].request = node.request
                         } else {
@@ -79,7 +79,7 @@ class Emulation {
                         Statistics.totalBlocked += 1
                     }
                     if shoulRequestCome {
-                        if node.isWorked(workedProbability: lemerSequence[tick]) {
+                        if node.isWorked(workedProbability: lemerSequence[Int.random(in: 0..<Constants.n)]) {
                             Statistics.totalRequestGenerated += 1
                             node.request = Request(creationTime: tick)
                             if nodes[1].isFull() {

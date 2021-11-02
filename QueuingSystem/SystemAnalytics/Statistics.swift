@@ -22,12 +22,31 @@ class Statistics {//: IStatistics {
     static var totalRequestSecondChannel: Int = 0
     static var states = [[Int]: Int]()
     
-    static func getProbabilities() -> [String: Double] {
-        var result = [String: Double]()
+    static func clearValues() {
+        totalRequestDone = 0
+        totalRequestGenerated = 0
+        totalRequestInSystemTime = 0
+        totalReject = 0
+        totalBlocked = 0
+        totalRequestSystem = 0
+        totalRequestQueue = 0
+        totalRequestQueueDone = 0
+        totalRequestInQueueTime = 0
+        totalRequestFirstChannel = 0
+        totalRequestSecondChannel = 0
+        states = [[Int]: Int]()
+    }
+    
+    static func getProbabilities() -> String {
+        var resultStringProbabilities = ""
         for (key, value) in states {
-            result[key.debugDescription] = Double(value) / Double(Constants.n)
+            resultStringProbabilities.append("P")
+            for item in key {
+                resultStringProbabilities.append("\(item)")
+            }
+            resultStringProbabilities.append(": \((Double(value) / Double(Constants.n)).roundToPlaces(places: 4))\n")
         }
-        return result
+        return resultStringProbabilities
     }
     
     //P_отк
